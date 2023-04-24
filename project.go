@@ -260,6 +260,7 @@ func uploadFiles(w http.ResponseWriter, r *http.Request) {
 func delete(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	emp := r.URL.Query().Get("id")
+	log.Println("deleted successfully", emp)
 	delForm, err := db.Prepare("DELETE FROM upload WHERE id=?")
 	if err != nil {
 		panic(err.Error())
@@ -269,9 +270,9 @@ func delete(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 	http.Redirect(w, r, "/", 301)
 }
+
 func star(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
-	// emp := r.URL.Query().Get("id")
 	if r.Method != "POST" {
 		http.ServeFile(w, r, "static/templates/uploadfile.html")
 		return
@@ -290,6 +291,60 @@ func star(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 	http.Redirect(w, r, "/", 301)
 }
+func Buy(w http.ResponseWriter, r *http.Request) {
+	db := dbConn()
+	emp := r.URL.Query().Get("id")
+	delForm, err := db.Prepare("DELETE FROM upload WHERE id=?")
+	if err != nil {
+		panic(err.Error())
+	}
+	delForm.Exec(emp)
+	log.Println("Updated successfully", emp)
+	defer db.Close()
+	http.Redirect(w, r, "/", 301)
+}
+
+// func show_korzina(w http.ResponseWriter, r *http.Request) {
+// 	db := dbConn()
+// 	selDB, err := db.Query("SELECT * FROM korzina ORDER BY id DESC")
+
+// 	if err != nil {
+// 		panic(err.Error())
+// 	}
+// 	upld := upfile{}
+// 	res := []upfile{}
+// 	for selDB.Next() {
+// 		var id, price int
+// 		var fname, item_type, path string
+// 		var coment sql.NullString
+// 		var star sql.NullInt32
+
+// 		err = selDB.Scan(&id, &fname, &item_type, &star, &path, &price, &coment)
+// 		if err != nil {
+// 			panic(err.Error())
+// 		}
+// 		upld.ID = id
+// 		upld.Fname = fname
+// 		upld.Item_type = item_type
+// 		upld.Star = star
+// 		upld.Path = path
+// 		upld.Price = price
+// 		upld.Comment = coment
+// 		res = append(res, upld)
+
+// 	}
+
+// 	upld.Count = len(res)
+
+// 	if upld.Count > 0 {
+// 		tmpl.ExecuteTemplate(w, "showboy.html", res)
+// 	} else {
+// 		tmpl.ExecuteTemplate(w, "showboy.html", nil)
+// 	}
+
+// 	db.Close()
+
+// }
 func handleRequest() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	http.HandleFunc("/login", loginPage)
@@ -300,6 +355,8 @@ func handleRequest() {
 	http.HandleFunc("/uploadfiles", uploadFiles)
 	http.HandleFunc("/dele", delete)
 	http.HandleFunc("/star", star)
+	http.HandleFunc("/buy", Buy)
+	// http.HandleFunc("/korzina", show_korzina)
 
 	log.Println("Server started on: http://localhost:9000")
 
@@ -307,7 +364,6 @@ func handleRequest() {
 }
 
 func main() {
-
 	handleRequest()
 
 }
