@@ -1,8 +1,6 @@
 # midterm2
 Zangar Tasbolat
 
-
-Explain this code more specifically
 package main
 import (
 	"database/sql"
